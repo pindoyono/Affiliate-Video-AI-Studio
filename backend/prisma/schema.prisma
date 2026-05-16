@@ -91,6 +91,7 @@ model Video {
   product      Product     @relation(fields: [productId], references: [id])
   presenter    Presenter?  @relation(fields: [presenterId], references: [id])
   scenes       Scene[]
+  analytics    VideoAnalytics[]
 }
 
 enum VideoMode {
@@ -164,6 +165,21 @@ model AffiliateData {
   conversionCount     Int      @default(0)
   updatedAt           DateTime @updatedAt
   product             Product  @relation(fields: [productId], references: [id])
+}
+
+model VideoAnalytics {
+  id          String   @id @default(uuid())
+  videoId     String
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  ctr         Float    @default(0)
+  watchTime   Float    @default(0)
+  retention   Float    @default(0)
+  conversion  Float    @default(0)
+  revenue     Float    @default(0)
+  roi         Float    @default(0)
+  recordedAt  DateTime @default(now())
+  video       Video    @relation(fields: [videoId], references: [id])
 }
 
 model JobQueue {

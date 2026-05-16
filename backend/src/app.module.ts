@@ -13,6 +13,7 @@ import { WorkersModule } from './workers/workers.module';
 import { RenderModule } from './render/render.module';
 import { StorageModule } from './storage/storage.module';
 import { AffiliateModule } from './affiliate/affiliate.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AffiliateModule } from './affiliate/affiliate.module';
     RenderModule,
     StorageModule,
     AffiliateModule,
+    AnalyticsModule,
   ],
 })
 export class AppModule {}
