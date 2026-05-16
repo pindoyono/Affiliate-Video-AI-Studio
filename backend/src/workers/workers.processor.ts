@@ -43,7 +43,7 @@ export class VideoRenderWorker {
       const key = await this.renderService.uploadRenderedVideo(videoId, outputPath);
       const url = await this.renderService.getVideoUrl(key);
 
-      await this.videosService.updateStatus(videoId, 'COMPLETED', url);
+      await this.videosService.updateStatus(videoId, 'PUBLISHED', url);
       this.logger.log(`Render complete for video: ${videoId}`);
     } catch (err) {
       this.logger.error(`Render failed for ${videoId}: ${err.message}`);

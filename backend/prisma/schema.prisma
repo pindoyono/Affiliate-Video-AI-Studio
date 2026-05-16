@@ -93,6 +93,7 @@ model Video {
   scenes       Scene[]
   analytics    VideoAnalytics[]
   variants     VideoVariant[]
+  reviews      VideoReview[]
 }
 
 enum VideoMode {
@@ -103,9 +104,19 @@ enum VideoMode {
 
 enum VideoStatus {
   DRAFT
+  REVIEW
+  APPROVED
+  SCHEDULED
   RENDERING
-  COMPLETED
+  PUBLISHED
   FAILED
+  ARCHIVED
+}
+
+enum ReviewAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
 }
 
 model Scene {
@@ -181,6 +192,16 @@ model VideoVariant {
   isSelected  Boolean  @default(false)
   createdAt   DateTime @default(now())
   video       Video    @relation(fields: [videoId], references: [id])
+}
+
+model VideoReview {
+  id         String       @id @default(uuid())
+  videoId    String
+  reviewerId String
+  action     ReviewAction
+  notes      String?
+  createdAt  DateTime     @default(now())
+  video      Video        @relation(fields: [videoId], references: [id])
 }
 
 model VideoAnalytics {

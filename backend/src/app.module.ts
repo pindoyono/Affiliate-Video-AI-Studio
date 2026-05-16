@@ -15,6 +15,7 @@ import { StorageModule } from './storage/storage.module';
 import { AffiliateModule } from './affiliate/affiliate.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { VideoVariantModule } from './video-variant/video-variant.module';
+import { ReviewModule } from './review/review.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { VideoVariantModule } from './video-variant/video-variant.module';
     AffiliateModule,
     AnalyticsModule,
     VideoVariantModule,
+    ReviewModule,
   ],
 })
 export class AppModule {}
