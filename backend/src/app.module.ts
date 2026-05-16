@@ -17,6 +17,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { VideoVariantModule } from './video-variant/video-variant.module';
 import { ReviewModule } from './review/review.module';
 import { PublishModule } from './publish/publish.module';
+import { MemoryModule } from './memory/memory.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { PublishModule } from './publish/publish.module';
     VideoVariantModule,
     ReviewModule,
     PublishModule,
+    MemoryModule,
   ],
 })
 export class AppModule {}

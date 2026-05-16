@@ -4,6 +4,7 @@ import OpenAI from 'openai';
 import { PrismaService } from '../prisma/prisma.service';
 import { OllamaService } from './ollama.service';
 import { GenerateContentDto } from './ai-content.dto';
+import { MemoryService } from '../memory/memory.service';
 
 @Injectable()
 export class AiContentService {
@@ -14,6 +15,7 @@ export class AiContentService {
     private prisma: PrismaService,
     private ollamaService: OllamaService,
     private configService: ConfigService,
+    private memoryService: MemoryService,
   ) {
     this.openai = new OpenAI({
       apiKey: configService.get<string>('OPENAI_API_KEY', 'placeholder'),
@@ -26,38 +28,40 @@ export class AiContentService {
     });
     if (!product) throw new NotFoundException('Product not found');
 
-    const title = await this.generateTitle(product.title, product.description || '');
-    const hook = await this.generateHook(product.title, product.description || '');
-    const script = await this.generateScript(product);
+    const prefContext = await this.memoryService.buildPromptContext(userId);
+
+    const title = await this.generateTitle(product.title, product.description || '', prefContext);
+    const hook = await this.generateHook(product.title, product.description || '', prefContext);
+    const script = await this.generateScript(product, prefContext);
     const storyboard = await this.generateStoryboard(script);
     const scenePrompts = await this.generateScenePrompts(storyboard, dto.mode);
-    const cta = await this.generateCTA(product.title, product.affiliateUrl || '');
+    const cta = await this.generateCTA(product.title, product.affiliateUrl || '', prefContext);
 
     return { title, hook, script, storyboard, scenePrompts, cta };
   }
 
-  async generateTitle(productTitle: string, description: string): Promise<string> {
+  async generateTitle(productTitle: string, description: string, prefContext = ''): Promise<string> {
     const prompt = `Create a compelling, viral video title for this affiliate product:
 Product: ${productTitle}
-Description: ${description}
+Description: ${description}${prefContext}
 Output only the title, max 60 characters.`;
     return this.callAI(prompt);
   }
 
-  async generateHook(productTitle: string, description: string): Promise<string> {
+  async generateHook(productTitle: string, description: string, prefContext = ''): Promise<string> {
     const prompt = `Create a powerful 3-second hook for a TikTok/Reels video about:
 Product: ${productTitle}
-Description: ${description}
+Description: ${description}${prefContext}
 Output only the hook sentence (max 15 words), designed to stop scrolling.`;
     return this.callAI(prompt);
   }
 
-  async generateScript(product: any): Promise<string> {
+  async generateScript(product: any, prefContext = ''): Promise<string> {
     const prompt = `Write a 60-second video script for an affiliate marketing video:
 Product: ${product.title}
 Description: ${product.description || 'N/A'}
 Price: ${product.price || 'N/A'}
-Rating: ${product.rating || 'N/A'}
+Rating: ${product.rating || 'N/A'}${prefContext}
 
 Structure: Hook (5s) -> Problem (10s) -> Solution/Product (25s) -> Social Proof (10s) -> CTA (10s)
 Keep it conversational and persuasive.`;
@@ -85,9 +89,9 @@ Output as JSON array of scene descriptions (strings only).`;
     });
   }
 
-  async generateCTA(productTitle: string, affiliateUrl: string): Promise<string> {
+  async generateCTA(productTitle: string, affiliateUrl: string, prefContext = ''): Promise<string> {
     const prompt = `Write a compelling call-to-action for "${productTitle}".
-Link available: ${affiliateUrl ? 'Yes' : 'No'}
+Link available: ${affiliateUrl ? 'Yes' : 'No'}${prefContext}
 Max 20 words. Action-oriented.`;
     return this.callAI(prompt);
   }
