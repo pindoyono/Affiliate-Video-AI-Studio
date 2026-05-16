@@ -16,6 +16,7 @@ import { AffiliateModule } from './affiliate/affiliate.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { VideoVariantModule } from './video-variant/video-variant.module';
 import { ReviewModule } from './review/review.module';
+import { PublishModule } from './publish/publish.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { ReviewModule } from './review/review.module';
     AnalyticsModule,
     VideoVariantModule,
     ReviewModule,
+    PublishModule,
   ],
 })
 export class AppModule {}

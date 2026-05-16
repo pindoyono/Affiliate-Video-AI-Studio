@@ -94,6 +94,7 @@ model Video {
   analytics    VideoAnalytics[]
   variants     VideoVariant[]
   reviews      VideoReview[]
+  publishJobs  PublishJob[]
 }
 
 enum VideoMode {
@@ -236,5 +237,35 @@ enum JobStatus {
   PROCESSING
   COMPLETED
   FAILED
+}
+
+enum PublishPlatform {
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+}
+
+enum PublishJobStatus {
+  PENDING
+  PROCESSING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+model PublishJob {
+  id               String           @id @default(uuid())
+  videoId          String
+  platform         PublishPlatform
+  scheduledAt      DateTime
+  publishedAt      DateTime?
+  status           PublishJobStatus @default(PENDING)
+  attempts         Int              @default(0)
+  maxAttempts      Int              @default(3)
+  platformVideoId  String?
+  error            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  video            Video            @relation(fields: [videoId], references: [id])
 }
 
