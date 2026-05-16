@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotFoundException } from '@nestjs/common';
+import { AffiliatePlatform } from '@prisma/client';
 import { AffiliateService } from './affiliate.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -15,7 +16,7 @@ const mockProduct = {
 const mockAffiliateData = {
   id: 'aff-uuid-1',
   productId: 'prod-uuid-1',
-  platform: 'SHOPEE',
+  platform: AffiliatePlatform.SHOPEE,
   commissionRate: 5,
   estimatedCommission: 5,
   affiliateAvailable: true,
@@ -23,6 +24,7 @@ const mockAffiliateData = {
   shortLink: 'http://localhost:3001/r/abc12345',
   clickCount: 10,
   conversionCount: 2,
+  createdAt: new Date(),
   updatedAt: new Date(),
 };
 
@@ -170,7 +172,7 @@ describe('AffiliateService', () => {
       mockPrisma.affiliateData.upsert.mockResolvedValue(mockAffiliateData);
 
       const result = await service.generate(
-        { productId: 'prod-uuid-1', platform: 'SHOPEE', commissionRate: 5 },
+        { productId: 'prod-uuid-1', platform: AffiliatePlatform.SHOPEE, commissionRate: 5 },
         'user-uuid-1',
       );
 
@@ -207,8 +209,37 @@ describe('AffiliateService', () => {
       await service.generate({ productId: 'prod-uuid-1' }, 'user-uuid-1');
 
       const upsertCall = mockPrisma.affiliateData.upsert.mock.calls[0][0];
-      expect(upsertCall.create.platform).toBe('SHOPEE');
+      expect(upsertCall.create.platform).toBe(AffiliatePlatform.SHOPEE);
       expect(upsertCall.create.commissionRate).toBe(5);
+    });
+
+    it('maps TIKTOK sourceType to AffiliatePlatform.TIKTOK', async () => {
+      const tiktokProduct = { ...mockProduct, sourceType: 'TIKTOK' };
+      mockPrisma.product.findFirst.mockResolvedValue(tiktokProduct);
+      mockPrisma.affiliateData.findUnique.mockResolvedValue(null);
+      mockPrisma.affiliateData.upsert.mockResolvedValue({
+        ...mockAffiliateData,
+        platform: AffiliatePlatform.TIKTOK,
+        commissionRate: 8,
+      });
+
+      await service.generate({ productId: 'prod-uuid-1' }, 'user-uuid-1');
+
+      const upsertCall = mockPrisma.affiliateData.upsert.mock.calls[0][0];
+      expect(upsertCall.create.platform).toBe(AffiliatePlatform.TIKTOK);
+      expect(upsertCall.create.commissionRate).toBe(8);
+    });
+
+    it('maps unknown sourceType to AffiliatePlatform.SHOPEE as default', async () => {
+      const manualProduct = { ...mockProduct, sourceType: 'MANUAL' };
+      mockPrisma.product.findFirst.mockResolvedValue(manualProduct);
+      mockPrisma.affiliateData.findUnique.mockResolvedValue(null);
+      mockPrisma.affiliateData.upsert.mockResolvedValue(mockAffiliateData);
+
+      await service.generate({ productId: 'prod-uuid-1' }, 'user-uuid-1');
+
+      const upsertCall = mockPrisma.affiliateData.upsert.mock.calls[0][0];
+      expect(upsertCall.create.platform).toBe(AffiliatePlatform.SHOPEE);
     });
   });
 

@@ -1,5 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { AffiliatePlatform } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GenerateAffiliateDto } from './affiliate.dto';
 
@@ -156,22 +157,24 @@ export class AffiliateService {
     return `${baseUrl}/r/${shortCode}`;
   }
 
-  /** Maps a Prisma SourceType to a platform display name. */
-  private platformFromSourceType(sourceType: string): string {
-    const map: Record<string, string> = {
-      SHOPEE: 'SHOPEE',
-      TIKTOK: 'TIKTOK',
-      MANUAL: 'MANUAL',
+  /** Maps a Prisma SourceType to an AffiliatePlatform enum value. */
+  private platformFromSourceType(sourceType: string): AffiliatePlatform {
+    const map: Record<string, AffiliatePlatform> = {
+      SHOPEE: AffiliatePlatform.SHOPEE,
+      TIKTOK: AffiliatePlatform.TIKTOK,
+      TOKOPEDIA: AffiliatePlatform.TOKOPEDIA,
+      AMAZON: AffiliatePlatform.AMAZON,
     };
-    return map[sourceType] ?? 'MANUAL';
+    return map[sourceType] ?? AffiliatePlatform.SHOPEE;
   }
 
   /** Default commission rates per platform (percentage). */
-  private defaultCommissionRate(platform: string): number {
-    const rates: Record<string, number> = {
-      SHOPEE: 5,
-      TIKTOK: 8,
-      MANUAL: 3,
+  private defaultCommissionRate(platform: AffiliatePlatform): number {
+    const rates: Record<AffiliatePlatform, number> = {
+      [AffiliatePlatform.SHOPEE]: 5,
+      [AffiliatePlatform.TIKTOK]: 8,
+      [AffiliatePlatform.TOKOPEDIA]: 5,
+      [AffiliatePlatform.AMAZON]: 4,
     };
     return rates[platform] ?? 5;
   }

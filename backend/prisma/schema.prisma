@@ -72,7 +72,12 @@ model TrendAnalysis {
   estimatedConversion   Float    @default(0)
   trendScore            Float    @default(0)
   analyzedAt            DateTime @default(now())
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
   product               Product  @relation(fields: [productId], references: [id])
+
+  @@index([productId])
+  @@index([analyzedAt])
 }
 
 model Video {
@@ -133,7 +138,12 @@ model Scene {
   narrationUrl  String?
   duration      Float       @default(5)
   status        SceneStatus @default(PENDING)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
   video         Video       @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([order])
 }
 
 enum SceneStatus {
@@ -151,6 +161,7 @@ model Presenter {
   appearance     Json?
   sampleImageUrl String?
   createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
   user           User     @relation(fields: [userId], references: [id])
   videos         Video[]
 }
@@ -163,22 +174,35 @@ model KnowledgeBase {
   category  String?
   embedding Float[]
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+enum AffiliatePlatform {
+  SHOPEE
+  TIKTOK
+  TOKOPEDIA
+  AMAZON
 }
 
 model AffiliateData {
-  id                  String   @id @default(uuid())
-  productId           String   @unique
-  platform            String
-  commissionRate      Float    @default(0)
-  estimatedCommission Float    @default(0)
-  affiliateAvailable  Boolean  @default(false)
+  id                  String            @id @default(uuid())
+  productId           String            @unique
+  platform            AffiliatePlatform
+  commissionRate      Float             @default(0)
+  estimatedCommission Float             @default(0)
+  affiliateAvailable  Boolean           @default(false)
   shortLink           String?
-  shortCode           String?  @unique
-  clickCount          Int      @default(0)
-  conversionCount     Int      @default(0)
-  updatedAt           DateTime @updatedAt
-  product             Product  @relation(fields: [productId], references: [id])
+  shortCode           String?           @unique
+  clickCount          Int               @default(0)
+  conversionCount     Int               @default(0)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  product             Product           @relation(fields: [productId], references: [id])
+
+  @@index([createdAt])
 }
 
 model VideoVariant {
@@ -186,7 +210,7 @@ model VideoVariant {
   videoId     String
   hook        String
   title       String
-  thumbnail   String
+  thumbnail   String?
   ctr         Float    @default(0)
   retention   Float    @default(0)
   score       Float    @default(0)
@@ -194,6 +218,9 @@ model VideoVariant {
   isSelected  Boolean  @default(false)
   createdAt   DateTime @default(now())
   video       Video    @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([createdAt])
 }
 
 model VideoReview {
@@ -203,7 +230,11 @@ model VideoReview {
   action     ReviewAction
   notes      String?
   createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
   video      Video        @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([createdAt])
 }
 
 model VideoAnalytics {
@@ -218,7 +249,13 @@ model VideoAnalytics {
   revenue     Float    @default(0)
   roi         Float    @default(0)
   recordedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   video       Video    @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([recordedAt])
+  @@index([createdAt])
 }
 
 model JobQueue {
@@ -231,6 +268,9 @@ model JobQueue {
   attempts  Int       @default(0)
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
 }
 
 enum JobStatus {
@@ -268,6 +308,10 @@ model PublishJob {
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   video            Video            @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([createdAt])
+  @@index([status])
 }
 
 model UserPreference {
@@ -317,4 +361,9 @@ model AgentTask {
   chainOrder  Int?
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([chainId])
+  @@index([createdAt])
+  @@index([status])
 }

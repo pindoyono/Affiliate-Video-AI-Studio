@@ -1,12 +1,13 @@
 import {
-  IsString,
   IsUUID,
   IsOptional,
   IsNumber,
+  IsEnum,
   Min,
   Max,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { AffiliatePlatform } from '@prisma/client';
 
 export class GenerateAffiliateDto {
   @ApiProperty({ description: 'Product UUID to generate affiliate data for' })
@@ -14,13 +15,14 @@ export class GenerateAffiliateDto {
   productId: string;
 
   @ApiProperty({
-    description: 'Platform for the affiliate link (e.g. SHOPEE, TIKTOK, MANUAL)',
-    example: 'SHOPEE',
+    description: 'Platform for the affiliate link',
+    enum: AffiliatePlatform,
+    example: AffiliatePlatform.SHOPEE,
     required: false,
   })
   @IsOptional()
-  @IsString()
-  platform?: string;
+  @IsEnum(AffiliatePlatform)
+  platform?: AffiliatePlatform;
 
   @ApiProperty({
     description: 'Commission rate percentage (0–100)',
