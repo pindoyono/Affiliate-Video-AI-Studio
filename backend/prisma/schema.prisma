@@ -42,6 +42,7 @@ model Product {
   user           User            @relation(fields: [userId], references: [id])
   videos         Video[]
   trendAnalyses  TrendAnalysis[]
+  affiliateData  AffiliateData?
 }
 
 enum SourceType {
@@ -144,6 +145,21 @@ model KnowledgeBase {
   embedding Float[]
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
+}
+
+model AffiliateData {
+  id                  String   @id @default(uuid())
+  productId           String   @unique
+  platform            String
+  commissionRate      Float    @default(0)
+  estimatedCommission Float    @default(0)
+  affiliateAvailable  Boolean  @default(false)
+  shortLink           String?
+  shortCode           String?  @unique
+  clickCount          Int      @default(0)
+  conversionCount     Int      @default(0)
+  updatedAt           DateTime @updatedAt
+  product             Product  @relation(fields: [productId], references: [id])
 }
 
 model JobQueue {
