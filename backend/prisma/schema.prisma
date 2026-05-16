@@ -327,6 +327,25 @@ model UserPreference {
   user           User     @relation(fields: [userId], references: [id])
 }
 
+model AiUsage {
+  id               String   @id @default(cuid())
+  service          String
+  provider         String
+  tokens           Int?
+  promptTokens     Int?
+  completionTokens Int?
+  estimatedCost    Float?
+  requestType      String?
+  userId           String?
+  projectId        String?
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([projectId])
+  @@index([provider])
+  @@index([createdAt])
+}
+
 enum AgentType {
   TREND
   RESEARCH

@@ -19,6 +19,7 @@ import { ReviewModule } from './review/review.module';
 import { PublishModule } from './publish/publish.module';
 import { MemoryModule } from './memory/memory.module';
 import { AgentModule } from './agent/agent.module';
+import { AiCostModule } from './ai-cost/ai-cost.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { AgentModule } from './agent/agent.module';
     PublishModule,
     MemoryModule,
     AgentModule,
+    AiCostModule,
   ],
 })
 export class AppModule {}
