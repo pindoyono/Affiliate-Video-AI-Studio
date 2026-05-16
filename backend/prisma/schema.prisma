@@ -18,6 +18,7 @@ model User {
   presenters Presenter[]
   products   Product[]
   knowledge  KnowledgeBase[]
+  preference UserPreference?
 }
 
 model Product {
@@ -36,12 +37,17 @@ model Product {
   sourceType     SourceType
   trendScore     Float?
   trendData      Json?
+  searchVolume   Int?
+  growthVelocity Float?
+  seasonality    Float?
+  creatorCount   Int?
   status         ProductStatus   @default(PENDING)
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   user           User            @relation(fields: [userId], references: [id])
   videos         Video[]
   trendAnalyses  TrendAnalysis[]
+  affiliateData  AffiliateData?
 }
 
 enum SourceType {
@@ -86,6 +92,10 @@ model Video {
   product      Product     @relation(fields: [productId], references: [id])
   presenter    Presenter?  @relation(fields: [presenterId], references: [id])
   scenes       Scene[]
+  analytics    VideoAnalytics[]
+  variants     VideoVariant[]
+  reviews      VideoReview[]
+  publishJobs  PublishJob[]
 }
 
 enum VideoMode {
@@ -96,9 +106,19 @@ enum VideoMode {
 
 enum VideoStatus {
   DRAFT
+  REVIEW
+  APPROVED
+  SCHEDULED
   RENDERING
-  COMPLETED
+  PUBLISHED
   FAILED
+  ARCHIVED
+}
+
+enum ReviewAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
 }
 
 model Scene {
@@ -146,6 +166,61 @@ model KnowledgeBase {
   user      User     @relation(fields: [userId], references: [id])
 }
 
+model AffiliateData {
+  id                  String   @id @default(uuid())
+  productId           String   @unique
+  platform            String
+  commissionRate      Float    @default(0)
+  estimatedCommission Float    @default(0)
+  affiliateAvailable  Boolean  @default(false)
+  shortLink           String?
+  shortCode           String?  @unique
+  clickCount          Int      @default(0)
+  conversionCount     Int      @default(0)
+  updatedAt           DateTime @updatedAt
+  product             Product  @relation(fields: [productId], references: [id])
+}
+
+model VideoVariant {
+  id          String   @id @default(uuid())
+  videoId     String
+  hook        String
+  title       String
+  thumbnail   String
+  ctr         Float    @default(0)
+  retention   Float    @default(0)
+  score       Float    @default(0)
+  isWinner    Boolean  @default(false)
+  isSelected  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  video       Video    @relation(fields: [videoId], references: [id])
+}
+
+model VideoReview {
+  id         String       @id @default(uuid())
+  videoId    String
+  reviewerId String
+  action     ReviewAction
+  notes      String?
+  createdAt  DateTime     @default(now())
+  video      Video        @relation(fields: [videoId], references: [id])
+}
+
+model VideoAnalytics {
+  id          String   @id @default(uuid())
+  videoId     String
+  views       Int      @default(0)
+  clicks      Int      @default(0)
+  ctr         Float    @default(0)
+  watchTime   Float    @default(0)
+  retention   Float    @default(0)
+  conversion  Float    @default(0)
+  revenue     Float    @default(0)
+  roi         Float    @default(0)
+  recordedAt  DateTime @default(now())
+  video       Video    @relation(fields: [videoId], references: [id])
+}
+
 model JobQueue {
   id        String    @id @default(uuid())
   type      String
@@ -165,3 +240,81 @@ enum JobStatus {
   FAILED
 }
 
+enum PublishPlatform {
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+}
+
+enum PublishJobStatus {
+  PENDING
+  PROCESSING
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+model PublishJob {
+  id               String           @id @default(uuid())
+  videoId          String
+  platform         PublishPlatform
+  scheduledAt      DateTime
+  publishedAt      DateTime?
+  status           PublishJobStatus @default(PENDING)
+  attempts         Int              @default(0)
+  maxAttempts      Int              @default(3)
+  platformVideoId  String?
+  error            String?
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  video            Video            @relation(fields: [videoId], references: [id])
+}
+
+model UserPreference {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  niche          String?
+  targetAudience String?
+  contentStyle   String?
+  language       String   @default("en")
+  embedding      Float[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id])
+}
+
+enum AgentType {
+  TREND
+  RESEARCH
+  AFFILIATE
+  STORY
+  SCRIPT
+  VOICE
+  VIDEO
+  ANALYTICS
+  OPTIMIZATION
+}
+
+enum AgentTaskStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model AgentTask {
+  id          String          @id @default(uuid())
+  agentType   AgentType
+  input       Json
+  output      Json?
+  status      AgentTaskStatus @default(PENDING)
+  error       String?
+  attempts    Int             @default(0)
+  maxAttempts Int             @default(3)
+  userId      String?
+  chainId     String?
+  chainOrder  Int?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}

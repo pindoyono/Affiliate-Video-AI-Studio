@@ -12,6 +12,13 @@ import { VideosModule } from './videos/videos.module';
 import { WorkersModule } from './workers/workers.module';
 import { RenderModule } from './render/render.module';
 import { StorageModule } from './storage/storage.module';
+import { AffiliateModule } from './affiliate/affiliate.module';
+import { AnalyticsModule } from './analytics/analytics.module';
+import { VideoVariantModule } from './video-variant/video-variant.module';
+import { ReviewModule } from './review/review.module';
+import { PublishModule } from './publish/publish.module';
+import { MemoryModule } from './memory/memory.module';
+import { AgentModule } from './agent/agent.module';
 
 @Module({
   imports: [
@@ -37,6 +44,13 @@ import { StorageModule } from './storage/storage.module';
     WorkersModule,
     RenderModule,
     StorageModule,
+    AffiliateModule,
+    AnalyticsModule,
+    VideoVariantModule,
+    ReviewModule,
+    PublishModule,
+    MemoryModule,
+    AgentModule,
   ],
 })
 export class AppModule {}
