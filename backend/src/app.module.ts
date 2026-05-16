@@ -18,6 +18,7 @@ import { VideoVariantModule } from './video-variant/video-variant.module';
 import { ReviewModule } from './review/review.module';
 import { PublishModule } from './publish/publish.module';
 import { MemoryModule } from './memory/memory.module';
+import { AgentModule } from './agent/agent.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { MemoryModule } from './memory/memory.module';
     ReviewModule,
     PublishModule,
     MemoryModule,
+    AgentModule,
   ],
 })
 export class AppModule {}

@@ -283,3 +283,38 @@ model UserPreference {
   user           User     @relation(fields: [userId], references: [id])
 }
 
+enum AgentType {
+  TREND
+  RESEARCH
+  AFFILIATE
+  STORY
+  SCRIPT
+  VOICE
+  VIDEO
+  ANALYTICS
+  OPTIMIZATION
+}
+
+enum AgentTaskStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model AgentTask {
+  id          String          @id @default(uuid())
+  agentType   AgentType
+  input       Json
+  output      Json?
+  status      AgentTaskStatus @default(PENDING)
+  error       String?
+  attempts    Int             @default(0)
+  maxAttempts Int             @default(3)
+  userId      String?
+  chainId     String?
+  chainOrder  Int?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
