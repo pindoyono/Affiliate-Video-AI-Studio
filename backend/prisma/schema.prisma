@@ -101,6 +101,7 @@ model Video {
   variants     VideoVariant[]
   reviews      VideoReview[]
   publishJobs  PublishJob[]
+  revenueReports RevenueReport[]
 }
 
 enum VideoMode {
@@ -325,6 +326,20 @@ model UserPreference {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   user           User     @relation(fields: [userId], references: [id])
+}
+
+model RevenueReport {
+  id        String   @id @default(cuid())
+  videoId   String
+  cost      Float
+  revenue   Float
+  profit    Float
+  roi       Float
+  createdAt DateTime @default(now())
+  video     Video    @relation(fields: [videoId], references: [id])
+
+  @@index([videoId])
+  @@index([createdAt])
 }
 
 model AiUsage {

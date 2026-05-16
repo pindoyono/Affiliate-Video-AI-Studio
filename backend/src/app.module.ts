@@ -20,6 +20,7 @@ import { PublishModule } from './publish/publish.module';
 import { MemoryModule } from './memory/memory.module';
 import { AgentModule } from './agent/agent.module';
 import { AiCostModule } from './ai-cost/ai-cost.module';
+import { RevenueModule } from './revenue/revenue.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { AiCostModule } from './ai-cost/ai-cost.module';
     MemoryModule,
     AgentModule,
     AiCostModule,
+    RevenueModule,
   ],
 })
 export class AppModule {}
